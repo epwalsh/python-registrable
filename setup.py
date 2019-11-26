@@ -31,5 +31,5 @@ setup(
     packages=find_packages(exclude=["registrable.tests.*", "tests"]),
     install_requires=read_reqs_file("requirements.txt"),
     tests_require=read_reqs_file("requirements.dev.txt"),
-    python_requires=">=3.6.1,<3.8",
+    python_requires=">=3.6.1",
 )

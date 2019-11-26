@@ -9,6 +9,10 @@ clean :
 		| xargs rm -rf
 	@rm -rf $(PROJECT)
 
+.PHONY : version
+version :
+	@python -c 'from registrable.version import VERSION; print(VERSION)'
+
 .PHONY : typecheck
 typecheck :
 	@echo "Typechecks: mypy"
@@ -49,3 +53,19 @@ install :
 uninstall :
 	@rm -rf ./$(MODULE).egg-info/
 	@python setup.py develop --uninstall
+
+.PHONY : build
+build :
+	@echo "Building package wheel distribution"
+	@python setup.py bdist_wheel
+	@echo "Building package source distribution"
+	@python setup.py sdist
+
+.PHONY : check-upload
+check-upload :
+	@twine upload dist/* -r pypitest
+	@echo "Go to https://test.pypi.org/project/registrable/ to verify"
+
+.PHONY : upload
+upload :
+	@twine upload dist/* -r pypi
