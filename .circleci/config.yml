@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  test:
+  test_py36:
     docker:
       - image: circleci/python:3.6
     working_directory: ~/registrable
