@@ -1,0 +1,97 @@
+version: 2
+jobs:
+  test:
+    docker:
+      - image: circleci/python:3.6
+    working_directory: ~/registrable
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restoring dependencies cache
+          keys:
+            - registrable-deps-v1-py36-{{ checksum "requirements.txt" }}-{{ checksum "requirements.dev.txt" }}
+            - registrable-deps-v1-py36-
+      - &setup_environment
+        run:
+          name: Installing dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            pip install -r requirements.dev.txt
+      - save_cache:
+          name: Saving dependencies cache
+          key: registrable-deps-v1-py36-{{ checksum "requirements.txt" }}-{{ checksum "requirements.dev.txt" }}
+          paths:
+            - venv
+      - &lint
+        run:
+          name: Running code linters
+          when: always
+          command: |
+            . venv/bin/activate
+            make lint
+      - &typecheck
+        run:
+          name: Running type checks
+          when: always
+          command: |
+            . venv/bin/activate
+            make typecheck
+      - &unit-tests
+        run:
+          name: Running unit tests
+          when: always
+          command: |
+            . venv/bin/activate
+            make unit-tests
+
+  test_py37:
+    docker:
+      - image: circleci/python:3.7
+    working_directory: ~/registrable
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restoring dependencies cache
+          keys:
+            - registrable-deps-v1-py37-{{ checksum "requirements.txt" }}-{{ checksum "requirements.dev.txt" }}
+            - registrable-deps-v1-py37-
+      - *setup_environment
+      - save_cache:
+          name: Saving dependencies cache
+          key: registrable-deps-v1-py37-{{ checksum "requirements.txt" }}-{{ checksum "requirements.dev.txt" }}
+          paths:
+            - venv
+      - *lint
+      - *typecheck
+      - *unit-tests
+
+  test_py38:
+    docker:
+      - image: circleci/python:3.8
+    working_directory: ~/registrable
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restoring dependencies cache
+          keys:
+            - registrable-deps-v1-py38-{{ checksum "requirements.txt" }}-{{ checksum "requirements.dev.txt" }}
+            - registrable-deps-v1-py38-
+      - *setup_environment
+      - save_cache:
+          name: Saving dependencies cache
+          key: registrable-deps-v1-py38-{{ checksum "requirements.txt" }}-{{ checksum "requirements.dev.txt" }}
+          paths:
+            - venv
+      - *lint
+      - *typecheck
+      - *unit-tests
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test_py36
+      - test_py37
+      - test_py38
