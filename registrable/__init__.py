@@ -1,5 +1,6 @@
 from collections import defaultdict
 import importlib
+import inspect
 from warnings import warn
 from typing import TypeVar, Type, Dict, List, Optional, Iterable, Tuple
 
@@ -40,12 +41,17 @@ class Registrable:
         registry = Registrable._registry[cls]
 
         def add_subclass_to_registry(subclass: Type[T]):
+            if not inspect.isclass(subclass) or not issubclass(subclass, cls):
+                raise RegistrationError(
+                    f"Cannot register {subclass.__name__} as {name}; "
+                    f"{subclass.__name__} must be a subclass of {cls.__name__}"
+                )
             # Add to registry.
             # If name already registered, warn if overriding or raise an error if override not allowed.
             if name in registry:
                 if not override:
                     raise RegistrationError(
-                        f"Cannot register {name} as {cls.__name__}; "
+                        f"Cannot register {subclass.__name__} as {name}; "
                         f"name already in use for {registry[name].__name__}"
                     )
                 else:
@@ -75,12 +81,21 @@ class Registrable:
                 )
 
             try:
-                return getattr(module, class_name)
+                maybe_subclass = getattr(module, class_name)
             except AttributeError:
                 raise RegistrationError(
                     f"tried to interpret {name} as a path to a class "
                     f"but unable to find class {class_name} in {submodule}"
                 )
+
+            if not inspect.isclass(maybe_subclass) or not issubclass(
+                maybe_subclass, cls
+            ):
+                raise RegistrationError(
+                    f"tried to interpret {name} as a path to a class "
+                    f"but {class_name} is not a subclass of {cls.__name__}"
+                )
+            return maybe_subclass
         else:
             # is not a qualified class name
             raise RegistrationError(

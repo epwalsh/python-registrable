@@ -1,6 +1,8 @@
 MODULE            = registrable
-SRC              := $(MODULE)
+INTEGRATION_TESTS = tests
+SRC              := $(MODULE) $(INTEGRATION_TESTS)
 PYTEST_COMMAND    = python -m pytest -v --color=yes
+PYTHONPATH        = $(INTEGRATION_TESTS)
 
 .PHONY : clean
 clean :
@@ -16,22 +18,27 @@ version :
 .PHONY : typecheck
 typecheck :
 	@echo "Typechecks: mypy"
-	@python -m mypy $(SRC) --ignore-missing-imports --no-site-packages
+	@PYTHONPATH=$(PYTHONPATH) python -m mypy $(SRC) --ignore-missing-imports --no-site-packages
 
 .PHONY : lint
 lint :
 	@echo "Lint: flake8"
-	@python -m flake8 $(SRC)
+	@PYTHONPATH=$(PYTHONPATH) python -m flake8 $(SRC)
 	@echo "Lint: black"
-	@python -m black --check $(SRC)
+	@PYTHONPATH=$(PYTHONPATH) python -m black --check $(SRC)
 
 .PHONY : unit-tests
 unit-tests :
 	@echo "Unit tests: pytest"
-	@$(PYTEST_COMMAND) $(SRC)
+	@PYTHONPATH=$(PYTHONPATH) $(PYTEST_COMMAND) $(MODULE)
+
+.PHONY : integration-tests
+integration-tests :
+	@echo "Integration tests: pytest"
+	@PYTHONPATH=$(PYTHONPATH) $(PYTEST_COMMAND) $(INTEGRATION_TESTS)
 
 .PHONY : test
-test : typecheck lint unit-tests
+test : typecheck lint unit-tests integration-tests
 
 .PHONY: create-branch
 create-branch :
