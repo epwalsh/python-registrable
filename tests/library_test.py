@@ -11,7 +11,13 @@ def test_registered_on_import():
 
 
 def test_by_fully_qualified_name():
+    assert not Foo.is_registered(
+        "example_module.unregistered_foo_subclasses.FooUnregistered"
+    )
     subclass = Foo.by_name("example_module.unregistered_foo_subclasses.FooUnregistered")
+    assert Foo.is_registered(
+        "example_module.unregistered_foo_subclasses.FooUnregistered"
+    )
     assert issubclass(subclass, Foo)
     assert subclass().do_something() == "Am I registered?"
 

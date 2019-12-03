@@ -95,6 +95,9 @@ class Registrable:
                     f"tried to interpret {name} as a path to a class "
                     f"but {class_name} is not a subclass of {cls.__name__}"
                 )
+
+            # Add subclass to registry and return it.
+            Registrable._registry[cls][name] = maybe_subclass
             return maybe_subclass
         else:
             # is not a qualified class name
