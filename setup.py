@@ -32,4 +32,13 @@ setup(
     install_requires=read_reqs_file("requirements.txt"),
     tests_require=read_reqs_file("requirements.dev.txt"),
     python_requires=">=3.6.1",
+    classifiers=[
+        "Intended Audience :: Developers",
+        "Development Status :: 3 - Alpha",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+    ],
 )
