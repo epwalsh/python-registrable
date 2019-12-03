@@ -2,7 +2,7 @@ from collections import defaultdict
 import importlib
 import inspect
 from warnings import warn
-from typing import TypeVar, Type, Dict, List, Optional, Iterable, Tuple
+from typing import TypeVar, Type, Dict, List, Optional, Iterable, Tuple, Callable
 
 from registrable.exceptions import RegistrationError
 
@@ -34,11 +34,18 @@ class Registrable:
     """
 
     _registry: Dict[Type, Dict[str, Type]] = defaultdict(dict)
+    _hooks: Optional[List[Callable[[Type, str], None]]] = None
     default_implementation: Optional[str] = None
 
     @classmethod
-    def register(cls: Type[T], name: str, override: bool = False):
+    def register(
+        cls: Type[T],
+        name: str,
+        override: bool = False,
+        hooks: Optional[List[Callable[[Type, str], None]]] = None,
+    ):
         registry = Registrable._registry[cls]
+        default_hooks = cls._hooks or []  # type: ignore
 
         def add_subclass_to_registry(subclass: Type[T]):
             if not inspect.isclass(subclass) or not issubclass(subclass, cls):
@@ -57,9 +64,18 @@ class Registrable:
                 else:
                     warn(f"Overriding {name} in {cls.__name__} registry")
             registry[name] = subclass
+            for hook in default_hooks + (hooks or []):
+                hook(subclass, name)
             return subclass
 
         return add_subclass_to_registry
+
+    @classmethod
+    def hook(cls, hook: Callable[[Type[T], str], None]):
+        if not cls._hooks:
+            cls._hooks = []
+        cls._hooks.append(hook)
+        return hook
 
     @classmethod
     def by_name(cls: Type[T], name: str) -> Type[T]:

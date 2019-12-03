@@ -9,6 +9,10 @@ def BaseClass():
         def do_something(self) -> int:
             raise NotImplementedError
 
+    @SomeRegistrableBaseClass.hook
+    def add_registered_name_hook(subclass, name):
+        subclass.registered_name = name
+
     return SomeRegistrableBaseClass
 
 
@@ -36,6 +40,11 @@ def test_register_default(BaseClass):
 
 def test_by_name(BaseClass):
     assert BaseClass.by_name("default_implementation")().do_something() == 1
+
+
+def test_registered_name_hook_worked(BaseClass):
+    subclass = BaseClass.by_name("default_implementation")
+    assert subclass.registered_name == "default_implementation"
 
 
 def test_iter_registered(BaseClass):
@@ -70,6 +79,19 @@ def test_override_registered(BaseClass):
         == "Overriding default_implementation in SomeRegistrableBaseClass registry"
     )
     assert BaseClass.by_name("default_implementation")().do_something() == 2
+
+
+def test_hooks_parameter(BaseClass):
+    @BaseClass.register(
+        "another",
+        hooks=[lambda subclass, name: setattr(subclass, "alternate_name", "blah")],
+    )
+    class AnotherImplementation(BaseClass):
+        def do_something(self) -> int:
+            return 2
+
+    assert AnotherImplementation.registered_name == "another"
+    assert AnotherImplementation.alternate_name == "blah"
 
 
 def test_register_non_subclass_fails(BaseClass):
