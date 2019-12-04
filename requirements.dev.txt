@@ -3,3 +3,5 @@ black>=19.3b0
 flake8>=3.7.8
 mypy>=0.730
 mypy-extensions>=0.4.1
+sphinx
+sphinx-rtd-theme==0.4.1

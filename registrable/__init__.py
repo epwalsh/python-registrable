@@ -8,11 +8,20 @@ from registrable.exceptions import RegistrationError
 
 
 T = TypeVar("T")
+"""
+Subclass type.
+"""
+
+HookType = Callable[[Type[T], str], None]
+"""
+Hooks are callables that take the subclass and registered name of the subclass.
+"""
 
 
 class Registrable:
     """
-    Adapted from https://github.com/allenai/allennlp/blob/master/allennlp/common/registrable.py.
+    Adapted from `allennlp.common.registrable
+    <https://github.com/allenai/allennlp/blob/master/allennlp/common/registrable.py>`_.
 
     Any class that inherits from ``Registrable`` gains access to a named registry for its
     subclasses. To register them, just decorate them with the classmethod
@@ -28,13 +37,13 @@ class Registrable:
     Note that if you use this class to implement a new ``Registrable`` abstract class,
     you must ensure that all subclasses of the abstract class are loaded when the module is
     loaded, because the subclasses register themselves in their respective files. You can
-    achieve this by having the abstract class and all subclasses in the __init__.py of the
+    achieve this by having the abstract class and all subclasses in the ``__init__.py`` of the
     module in which they reside (as this causes any import of either the abstract class or
     a subclass to load all other subclasses and the abstract class).
     """
 
     _registry: Dict[Type, Dict[str, Type]] = defaultdict(dict)
-    _hooks: Optional[List[Callable[[Type, str], None]]] = None
+    _hooks: Optional[List[HookType]] = None
     default_implementation: Optional[str] = None
 
     @classmethod
@@ -42,8 +51,25 @@ class Registrable:
         cls: Type[T],
         name: str,
         override: bool = False,
-        hooks: Optional[List[Callable[[Type, str], None]]] = None,
+        hooks: Optional[List[HookType]] = None,
     ):
+        """
+        Class decorator for registering a subclass.
+
+        Parameters
+        ----------
+        name : ``str``
+            The name to register the subclass under.
+        override : ``bool``, optional (default = False)
+            If ``name`` is already registered a :class:`registrable.exceptions.RegistrationError` will be raised
+            unless this is set to ``True``.
+        hooks : ``Optional[List[HookType]]``, optional (default = None)
+            Hooks to run when the subclass is registered.
+
+        Raises
+        ------
+        RegistrationError
+        """
         registry = Registrable._registry[cls]
         default_hooks = cls._hooks or []  # type: ignore
 
@@ -71,7 +97,10 @@ class Registrable:
         return add_subclass_to_registry
 
     @classmethod
-    def hook(cls, hook: Callable[[Type[T], str], None]):
+    def hook(cls, hook: HookType):
+        """
+        Function decorator for adding a default hook to a registrable base class.
+        """
         if not cls._hooks:
             cls._hooks = []
         cls._hooks.append(hook)
@@ -79,6 +108,23 @@ class Registrable:
 
     @classmethod
     def by_name(cls: Type[T], name: str) -> Type[T]:
+        """
+        Get a subclass by its registered name, or its fully qualified class name.
+
+        Parameters
+        ----------
+        name : ``str``
+
+        Returns
+        -------
+        Type[T]
+            The subclass registered under ``name``.
+
+        Raises
+        ------
+        RegistrationError
+            If name is not a registered subclass or valid fully qualified class name.
+        """
         if name in Registrable._registry[cls]:
             return Registrable._registry[cls][name]
         elif "." in name:
@@ -123,7 +169,9 @@ class Registrable:
 
     @classmethod
     def list_available(cls: Type[T]) -> List[str]:
-        """List default first if it exists"""
+        """
+        List all registered subclasses.
+        """
         keys = list(Registrable._registry[cls].keys())
         default = cls.default_implementation  # type: ignore
 
@@ -137,8 +185,14 @@ class Registrable:
 
     @classmethod
     def is_registered(cls: Type[T], name: str) -> bool:
+        """
+        Returns True if ``name`` is a registered name.
+        """
         return name in Registrable._registry[cls]
 
     @classmethod
     def iter_registered(cls: Type[T]) -> Iterable[Tuple[str, Type[T]]]:
+        """
+        Iterate through the registered names and subclasses.
+        """
         return Registrable._registry[cls].items()
