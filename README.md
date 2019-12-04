@@ -3,6 +3,7 @@
 [![CircleCI](https://circleci.com/gh/epwalsh/python-registrable.svg?style=svg)](https://circleci.com/gh/epwalsh/python-registrable)
 [![License](https://img.shields.io/github/license/epwalsh/python-registrable)](https://github.com/epwalsh/python-registrable/blob/master/LICENSE)
 [![PyPI version](https://badge.fury.io/py/registrable.svg)](https://pypi.org/project/registrable/)
+[![Documentation Status](https://readthedocs.org/projects/python-registrable/badge/?version=latest)](https://python-registrable.readthedocs.io/en/latest/?badge=latest)
 
 Python module for registering and instantiating classes by name. Based on the implementation from [AllenNLP](https://github.com/allenai/allennlp).
 
