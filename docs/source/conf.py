@@ -82,7 +82,7 @@ def linkcode_resolve(domain, info):
     """
     Determine the URL corresponding to Python object
     This code is from
-    https://github.com/numpy/numpy/blob/master/doc/source/conf.py#L290
+    https://github.com/numpy/numpy/blob/master/docs/source/conf.py#L290
     and https://github.com/Lasagne/Lasagne/pull/262
     """
     if domain != "py":

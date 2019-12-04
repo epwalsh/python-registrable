@@ -44,7 +44,7 @@ test : typecheck lint unit-tests integration-tests
 
 .PHONY : docs
 docs :
-	cd doc && make html
+	cd docs && make html
 
 .PHONY: create-branch
 create-branch :
