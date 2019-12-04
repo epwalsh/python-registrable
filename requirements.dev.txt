@@ -6,3 +6,4 @@ mypy-extensions>=0.4.1
 sphinx
 sphinx-rtd-theme==0.4.1
 numpydoc==0.8.0
+m2r==0.2.1

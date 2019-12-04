@@ -3,6 +3,7 @@ INTEGRATION_TESTS = tests
 SRC              := $(MODULE) $(INTEGRATION_TESTS)
 PYTEST_COMMAND    = python -m pytest -v --color=yes
 PYTHONPATH        = $(INTEGRATION_TESTS)
+VERSION           = $(shell python -c 'from registrable.version import VERSION; print(VERSION)')
 
 .PHONY : clean
 clean :
@@ -15,7 +16,7 @@ clean :
 
 .PHONY : version
 version :
-	@python -c 'from registrable.version import VERSION; print(VERSION)'
+	@echo $(VERSION)
 
 .PHONY : typecheck
 typecheck :
@@ -78,6 +79,13 @@ install :
 uninstall :
 	@rm -rf ./$(MODULE).egg-info/
 	@python setup.py develop --uninstall
+
+.PHONY : release
+release :
+	git add -A
+	git commit -m "Release: $(VERSION)"
+	git tag $(VERSION) -m "Adds tag $(VERSION) for PyPI"
+	git push --tags origin master
 
 .PHONY : build
 build :

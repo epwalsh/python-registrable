@@ -40,6 +40,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.coverage",
     "numpydoc",
+    "m2r",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
