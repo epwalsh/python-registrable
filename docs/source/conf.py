@@ -24,6 +24,7 @@ project = "registrable"
 copyright = "2019, Evan Pete Walsh"
 author = "Evan Pete Walsh"
 version = registrable.version.VERSION
+master_doc = "index"
 
 
 # -- General configuration ---------------------------------------------------
