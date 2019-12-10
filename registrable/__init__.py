@@ -44,7 +44,12 @@ class Registrable:
 
     _registry: Dict[Type, Dict[str, Type]] = defaultdict(dict)
     _hooks: Optional[List[HookType]] = None
+
     default_implementation: Optional[str] = None
+    """
+    Optional name of default implementation. If specified, the default will be listed
+    first in :func:`registrable.Registrable.list_available`.
+    """
 
     @classmethod
     def register(
@@ -171,6 +176,8 @@ class Registrable:
     def list_available(cls: Type[T]) -> List[str]:
         """
         List all registered subclasses.
+
+        If ``cls.default_implementation`` is specified, it will be first in the list.
         """
         keys = list(Registrable._registry[cls].keys())
         default = cls.default_implementation  # type: ignore

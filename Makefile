@@ -4,6 +4,7 @@ SRC              := $(MODULE) $(INTEGRATION_TESTS)
 PYTEST_COMMAND    = python -m pytest -v --color=yes
 PYTHONPATH        = $(INTEGRATION_TESTS)
 VERSION           = $(shell python -c 'from registrable.version import VERSION; print(VERSION)')
+DOCS              = README.md
 
 .PHONY : clean
 clean :
@@ -32,7 +33,7 @@ lint :
 
 .PHONY : unit-tests
 unit-tests :
-	@echo "Unit tests: pytest"
+	@echo "Unit tests: pytest / doctest"
 	@PYTHONPATH=$(PYTHONPATH) $(PYTEST_COMMAND) $(MODULE)
 
 .PHONY : integration-tests
@@ -40,8 +41,13 @@ integration-tests :
 	@echo "Integration tests: pytest"
 	@PYTHONPATH=$(PYTHONPATH) $(PYTEST_COMMAND) $(INTEGRATION_TESTS)
 
+.PHONY : doc-tests
+doc-tests :
+	@echo "Doc tests: pytest / doctest"
+	@PYTHONPATH=$(PYTHONPATH) $(PYTEST_COMMAND) --doctest-glob='*.md' $(DOCS)
+
 .PHONY : test
-test : typecheck lint unit-tests integration-tests
+test : typecheck lint unit-tests integration-tests doc-tests
 
 .PHONY : docs
 docs :

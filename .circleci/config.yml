@@ -45,6 +45,20 @@ jobs:
           command: |
             . venv/bin/activate
             make unit-tests
+      - &integration-tests
+        run:
+          name: Running integration tests
+          when: always
+          command: |
+            . venv/bin/activate
+            make integration-tests
+      - &doc-tests
+        run:
+          name: Running doc tests
+          when: always
+          command: |
+            . venv/bin/activate
+            make doc-tests
 
   test_py37:
     docker:
@@ -66,6 +80,8 @@ jobs:
       - *lint
       - *typecheck
       - *unit-tests
+      - *integration-tests
+      - *doc-tests
 
   test_py38:
     docker:
@@ -87,6 +103,8 @@ jobs:
       - *lint
       - *typecheck
       - *unit-tests
+      - *integration-tests
+      - *doc-tests
 
 workflows:
   version: 2
