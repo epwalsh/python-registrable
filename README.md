@@ -24,16 +24,25 @@ The basic way to use `registrable` is to create a `Registrable` base class and t
 
 ```python
 >>> from registrable import Registrable
->>> # Create a registrable base class.
 >>> class MyBaseClass(Registrable):
 ...    def do_something(self):
 ...        raise NotImplementedError
->>> # Now register subclass implementations of your base class.
+
+```
+
+To register subclass implementations of your base class:
+
+```python
 >>> @MyBaseClass.register("first_implementation")
 ... class SubclassA(MyBaseClass):
 ...     def do_something(self):
 ...         return 1
->>> # You can access an implementation by calling `.by_name()` on the base class.
+
+```
+
+Then access an implementation by calling `.by_name()` on the base class:
+
+```python
 >>> subclass = MyBaseClass.by_name("first_implementation")
 >>> instance = subclass()
 >>> instance.do_something()
